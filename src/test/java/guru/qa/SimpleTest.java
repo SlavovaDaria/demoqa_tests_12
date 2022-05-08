@@ -27,7 +27,7 @@ public class SimpleTest {
     }
 
     @Test
-    void assertTest() {
+    void assertTest0() {
 
     }
 
@@ -36,4 +36,16 @@ public class SimpleTest {
 
     }
 
+    @Test
+    void assertTest2() {
+
+    }
+    @Test
+    void assertTest3() {
+
+    }
+    @Test
+    void assertTest4() {
+
+    }
 }
