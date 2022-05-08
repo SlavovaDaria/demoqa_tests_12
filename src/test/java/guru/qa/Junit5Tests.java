@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 
-public class SimpleTest {
+public class Junit5Tests {
 
     @BeforeAll
     static void initDB() {
