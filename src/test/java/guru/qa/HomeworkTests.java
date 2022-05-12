@@ -1,68 +1,72 @@
 package guru.qa;
 
 import com.codeborne.selenide.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import guru.qa.Generator;
+import guru.qa.RegistrationFormPage;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import java.time.LocalDate;
+import static java.lang.String.format;
 
 public class HomeworkTests {
+    RegistrationFormPage registrationFormPage = new RegistrationFormPage();
+    Generator gen = new Generator();
+
+
+    LocalDate birthDate = gen.getDate();
+    String firstName = gen.getFirstName();
+    String lastName = gen.getLastName();
+    String email = gen.getEmail();
+    String gender = gen.getGender();
+    String phoneNumber = gen.getPhoneNumber();
+    String subject = gen.getSubject();
+    String hobby = gen.getHobby();
+    String imgPath = "img/1.jpg";
+    String address = gen.getAddress();
+    String state = gen.getState();
+    String city = gen.getCity(state);
+
+    //expected results
+    String expectedFullName = format("%s %s", firstName, lastName);
+    String expectedMonth = StringUtils.capitalize(birthDate.getMonth().toString().toLowerCase()); //Capitalized month name
+    String expectedDate = format("%s %s,%s", birthDate.getDayOfMonth(), expectedMonth, birthDate.getYear());
+    String expectedLocation = format("%s %s", state, city);
+    String expectedFileName = imgPath.substring(4);
 
     @BeforeAll
-    static void setUp() {
+    static void prepare() {
         Configuration.holdBrowserOpen = true;
         Configuration.baseUrl = "https://demoqa.com";
         Configuration.browserSize = "1920x1080";
     }
 
     @Test
-    void fillFormTest() {
-
-        open("/automation-practice-form");
-
-        $("#firstName").setValue("First Name");
-        $("#lastName").setValue("Last Name");
-        $("#userEmail").setValue("name@example.com");
-        $(byText("Other")).click();
-        $("#userNumber").setValue("0123456789");
-        $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select").selectOption("September");
-        $(".react-datepicker__year-select").selectOption("1991");
-        $("[aria-label$='September 4th, 1991']").click();
-        $("#subjectsInput").setValue("C").pressEnter();
-        $(byText("Reading")).click();
-        $("#uploadPicture").uploadFromClasspath("img/1.jpg");
-        $("#currentAddress").setValue("Current Address");
-        $("#state").click();
-        $("#stateCity-wrapper").$(byText("NCR")).click();
-        $("#city").click();
-        $("#stateCity-wrapper").$(byText("Delhi")).click();
-        $("#submit").click();
-
-        $("#example-modal-sizes-title-lg").shouldHave(text("Thanks for submitting the form"));
-        $(".table-responsive").$(byText("First Name Last Name"))
-                .parent().shouldHave(text("First Name Last Name"));
-        $(".table-responsive").$(byText("name@example.com"))
-                .parent().shouldHave(text("name@example.com"));
-        $(".table-responsive").$(byText("Other"))
-                .parent().shouldHave(text("Other"));
-        $(".table-responsive").$(byText("0123456789"))
-                .parent().shouldHave(text("0123456789"));
-        $(".table-responsive").$(byText("04 September,1991"))
-                .parent().shouldHave(text("04 September,1991"));
-        $(".table-responsive").$(byText("Physics"))
-                .parent().shouldHave(text("Physics"));
-        $(".table-responsive").$(byText("Reading"))
-                .parent().shouldHave(text("Reading"));
-        $(".table-responsive").$(byText("1.jpg"))
-                .parent().shouldHave(text("1.jpg"));
-        $(".table-responsive").$(byText("Current Address"))
-                .parent().shouldHave(text("Current Address"));
-        $(".table-responsive").$(byText("NCR Delhi"))
-                .parent().shouldHave(text("NCR Delhi"));
+    void execute() {
+        registrationFormPage.openPage()
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setEmail(email)
+                .setGender(gender)
+                .setPhoneNumber(phoneNumber)
+                .setBirthDate(birthDate)
+                .setSubject(subject)
+                .setHobby(hobby)
+                .uploadPicture(imgPath)
+                .setAddress(address)
+                .setStateAndCity(state, city)
+                .submitForm()
+                .checkTitle("Thanks for submitting the form")
+                .checkResult("Student Name", expectedFullName)
+                .checkResult("Student Email", email)
+                .checkResult("Gender", gender)
+                .checkResult("Mobile", phoneNumber)
+                .checkResult("Date of Birth", expectedDate)
+                .checkResult("Subjects", subject)
+                .checkResult("Hobbies", hobby)
+                .checkResult("Picture", expectedFileName)
+                .checkResult("Address", address)
+                .checkResult("State and City", expectedLocation);
     }
 }
