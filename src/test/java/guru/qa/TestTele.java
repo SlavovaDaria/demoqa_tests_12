@@ -1,5 +1,6 @@
 package guru.qa;
 
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,6 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
+import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
@@ -37,6 +39,7 @@ public class TestTele {
         $(".tariff-cards-container__sim-number-selection").$(byText(testData)).click();
         $$(".tariff-cards-container__sim-number-selection")
                 .find(text(expectedResult));
+        $(".tariff-cards-container__sim-number-selection").shouldHave(text(testData));
     }
 
     @ParameterizedTest
