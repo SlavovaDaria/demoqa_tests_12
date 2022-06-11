@@ -28,10 +28,7 @@ public class TestTele {
     @DisplayName("Discount")
     @ParameterizedTest(name = "Discount {0}, ожидаем результат: {1}")
     @CsvSource({"1, Скидка 0%",
-            "2, Скидка 0%",
-            "3, Скидка 5%",
-            "4, Скидка 10%",
-            "5, Скидка 15%"})
+            "2, Скидка 0%"})
     void DiscountTest(String testData, String expectedResult) {
         Selenide.open("https://spb.tele2.ru/");
         Selenide.zoom(0.75);
@@ -47,7 +44,6 @@ public class TestTele {
     })
     void DiscountTest(String testData) {
         Selenide.open("https://spb.tele2.ru/");
-        Selenide.zoom(0.75);
         $("#regionSearchOpener").click();
         $(".text-field").setValue(testData);
         $(".region-results").find(byText(testData)).click();
@@ -64,7 +60,6 @@ public class TestTele {
     @ParameterizedTest
     void methodSourceTest(String testData) {
         Selenide.open("https://spb.tele2.ru/");
-        Selenide.zoom(0.75);
         $("#regionSearchOpener").click();
         $(".text-field").setValue(testData);
         $(".region-results").find(byText(testData)).click();
