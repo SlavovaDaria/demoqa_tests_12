@@ -28,8 +28,11 @@ public class TestTele {
     @DisplayName("Discount")
     @ParameterizedTest(name = "Discount {0}, ожидаем результат: {1}")
     @CsvSource({"1, Скидка 0%",
-            "2, Скидка 0%"})
-    void DiscountTest(String testData, String expectedResult) {
+            "2, Скидка 0%",
+            "3, Скидка 5%",
+            "4, Скидка 10%",
+            "5, Скидка 15%"})
+    void discountTest(String testData, String expectedResult) {
         Selenide.open("https://spb.tele2.ru/");
         $(".tariff-cards-container__sim-number-selection").$(byText(testData)).click();
         $$(".tariff-cards-container__sim-number-selection")
@@ -41,7 +44,7 @@ public class TestTele {
             "Москва и область",
             "Санкт-Петербург и Ленинградская область"
     })
-    void DiscountTest(String testData) {
+    void discountTest(String testData) {
         Selenide.open("https://spb.tele2.ru/");
         $("#regionSearchOpener").click();
         $(".text-field").setValue(testData);
