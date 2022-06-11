@@ -17,7 +17,7 @@ import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
-public class Test6 {
+public class TestTele {
 
     @BeforeAll
     static void setUp() {
@@ -25,50 +25,45 @@ public class Test6 {
     }
 
 
-    @DisplayName("Checksim")
-    @ParameterizedTest(name = "Checksim {0}, ожидаем результат: {1}")
+    @DisplayName("Discount")
+    @ParameterizedTest(name = "Discount {0}, ожидаем результат: {1}")
     @CsvSource({"1, Скидка 0%",
             "2, Скидка 0%",
             "3, Скидка 5%",
             "4, Скидка 10%",
             "5, Скидка 15%"})
-    void simSellTest(String testData, String expectedResult) {
-        Selenide.open("https://karelia.tele2.ru/");
+    void DiscountTest(String testData, String expectedResult) {
+        Selenide.open("https://spb.tele2.ru/");
         Selenide.zoom(0.75);
         $(".tariff-cards-container__sim-number-selection").$(byText(testData)).click();
         $$(".tariff-cards-container__sim-number-selection")
                 .find(text(expectedResult));
-
-
     }
-
-    ;
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "Алтайский край",
-            "Ростовская область"
+            "Москва и область",
+            "Санкт-Петербург и Ленинградская область"
     })
-    void simSellTest(String testData) {
-        Selenide.open("https://karelia.tele2.ru/");
+    void DiscountTest(String testData) {
+        Selenide.open("https://spb.tele2.ru/");
         Selenide.zoom(0.75);
         $("#regionSearchOpener").click();
         $(".text-field").setValue(testData);
         $(".region-results").find(byText(testData)).click();
         $("#regionSearchOpener").shouldHave(text(testData));
     }
-    ;
 
     static Stream<Arguments>methodSourceTest() {
         return Stream.of(
-                Arguments.of("Алтайский край"),
-                Arguments.of("Ростовская область")
+                Arguments.of("Москва и область"),
+                Arguments.of("Санкт-Петербург и Ленинградская область")
         );
     }
     @MethodSource("methodSourceTest")
     @ParameterizedTest
     void methodSourceTest(String testData) {
-        Selenide.open("https://karelia.tele2.ru/");
+        Selenide.open("https://spb.tele2.ru/");
         Selenide.zoom(0.75);
         $("#regionSearchOpener").click();
         $(".text-field").setValue(testData);
