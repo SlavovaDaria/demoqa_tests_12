@@ -31,7 +31,6 @@ public class TestTele {
             "2, Скидка 0%"})
     void DiscountTest(String testData, String expectedResult) {
         Selenide.open("https://spb.tele2.ru/");
-        Selenide.zoom(0.75);
         $(".tariff-cards-container__sim-number-selection").$(byText(testData)).click();
         $$(".tariff-cards-container__sim-number-selection")
                 .find(text(expectedResult));
