@@ -1,5 +1,6 @@
 package guru.qa;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
@@ -35,7 +36,7 @@ public class SelenideTest {
 
         $(linkText("SlavovaDaria/demoqa_tests_12")).click();
         $(partialLinkText("Issues")).click();
-        $(withText("#1")).click();
+        $(withText("#1")).should(Condition.exist);
     }
 
 }

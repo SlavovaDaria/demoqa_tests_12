@@ -1,5 +1,6 @@
 package guru.qa;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Allure;
@@ -38,7 +39,7 @@ public class LambdaStepTest {
             $(partialLinkText("Issues")).click();
         });
         step("CheckIssueNumber" + ISSUE_NUMBER, () -> {
-            $(withText("#1")).click();
+            $(withText("#1")).should(Condition.exist);
             Allure.getLifecycle().addAttachment(
                     "Page",
                     "text/html",
