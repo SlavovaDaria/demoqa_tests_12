@@ -1,68 +1,133 @@
 package guru.qa;
 
-import com.codeborne.selenide.Configuration;
-import org.junit.jupiter.api.BeforeAll;
+import com.codeborne.pdftest.PDF;
+import com.codeborne.pdftest.matchers.ContainsExactText;
+import com.codeborne.xlstest.XLS;
+import com.opencsv.CSVReader;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.lang.AssertionError;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HomeworkTests {
+    public static String resourceName = "src/test/resources/ziplesson.zip";
+    public static String resourceZipName = "ziplesson.zip";
 
-    @BeforeAll
-    static void setUp() {
-        Configuration.holdBrowserOpen = true;
-        Configuration.baseUrl = "https://demoqa.com";
-        Configuration.browserSize = "1920x1080";
+    public static String textPdfName = "example.pdf";
+    public static String textXlsxName = "import_ou_xlsx.xlsx";
+    public static String textCsvName = "import_ou_csv.csv";
+    public static File file = new File(resourceName);
+    static ClassLoader cl = HomeworkTests.class.getClassLoader();
+
+    static void zipFindTest(String findText) {
+        try {
+            ZipFile sourceZipFile = new ZipFile(file);
+            String searchFileName = findText;
+            Enumeration e = sourceZipFile.entries();
+            boolean found = false;
+            System.out.println("Trying to search " + searchFileName + " in " + sourceZipFile.getName());
+            while (e.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
+
+                if (entry.getName().indexOf(searchFileName) != -1) {
+                    found = true;
+                    System.out.println("Found " + entry.getName());
+
+                }
+            }
+
+            if (found == false) {
+                System.out.println("File " + searchFileName + " Not Found inside ZIP file " + sourceZipFile.getName());
+            }
+
+            sourceZipFile.close();
+        } catch (IOException ioe) {
+            System.out.println("Error opening zip file" + ioe);
+        }
     }
 
     @Test
-    void fillFormTest() {
+    void zipParsingTest() throws Exception {
+        ZipFile zf = new ZipFile(file);
+        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream(resourceZipName));
+        ZipEntry entry;
+        while ((entry = is.getNextEntry()) != null) {
+            zipFindTest(entry.getName());
+            System.out.println(String.format(
+                    "Item: %s \nType: %s \nSize: %d\n",
+                    entry.getName(),
+                    entry.isDirectory() ? "directory" : "file",
+                    entry.getSize()
+            ));
+        }
+    }
 
-        open("/automation-practice-form");
+    @Test
+    void zipPdfTest() throws Exception {
+        ZipFile zf = new ZipFile(file);
+        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream(resourceZipName));
+        ZipEntry entry;
+        while ((entry = is.getNextEntry()) != null) {
+            try (InputStream inputStream = zf.getInputStream(entry)) {
+                if (entry.getName().equals(textPdfName)) {
+                    PDF pdf = new PDF(inputStream);
+                    Assertions.assertEquals(1, pdf.numberOfPages);
+                    assertThat(pdf, new ContainsExactText("PDF"));
+                    System.out.println("example.pdf found and checked success");
+                }
+            }
+        }
+    }
 
-        $("#firstName").setValue("First Name");
-        $("#lastName").setValue("Last Name");
-        $("#userEmail").setValue("name@example.com");
-        $(byText("Other")).click();
-        $("#userNumber").setValue("0123456789");
-        $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select").selectOption("September");
-        $(".react-datepicker__year-select").selectOption("1991");
-        $("[aria-label$='September 4th, 1991']").click();
-        $("#subjectsInput").setValue("C").pressEnter();
-        $(byText("Reading")).click();
-        $("#uploadPicture").uploadFromClasspath("img/1.jpg");
-        $("#currentAddress").setValue("Current Address");
-        $("#state").click();
-        $("#stateCity-wrapper").$(byText("NCR")).click();
-        $("#city").click();
-        $("#stateCity-wrapper").$(byText("Delhi")).click();
-        $("#submit").click();
 
-        $("#example-modal-sizes-title-lg").shouldHave(text("Thanks for submitting the form"));
-        $(".table-responsive").$(byText("First Name Last Name"))
-                .parent().shouldHave(text("First Name Last Name"));
-        $(".table-responsive").$(byText("name@example.com"))
-                .parent().shouldHave(text("name@example.com"));
-        $(".table-responsive").$(byText("Other"))
-                .parent().shouldHave(text("Other"));
-        $(".table-responsive").$(byText("0123456789"))
-                .parent().shouldHave(text("0123456789"));
-        $(".table-responsive").$(byText("04 September,1991"))
-                .parent().shouldHave(text("04 September,1991"));
-        $(".table-responsive").$(byText("Physics"))
-                .parent().shouldHave(text("Physics"));
-        $(".table-responsive").$(byText("Reading"))
-                .parent().shouldHave(text("Reading"));
-        $(".table-responsive").$(byText("1.jpg"))
-                .parent().shouldHave(text("1.jpg"));
-        $(".table-responsive").$(byText("Current Address"))
-                .parent().shouldHave(text("Current Address"));
-        $(".table-responsive").$(byText("NCR Delhi"))
-                .parent().shouldHave(text("NCR Delhi"));
+    @Test
+    void zipXlsTest() throws Exception {
+        ZipFile zf = new ZipFile(file);
+        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream(resourceZipName));
+        ZipEntry entry;
+        while ((entry = is.getNextEntry()) != null) {
+            try (InputStream inputStream = zf.getInputStream(entry)) {
+                if (entry.getName().equals(textXlsxName)) {
+                    XLS xls = new XLS(inputStream);
+                    String stringCellValue = xls.excel.getSheetAt(0).getRow(3).getCell(1).getStringCellValue();
+                    org.assertj.core.api.Assertions.assertThat(stringCellValue).contains("A");
+                    System.out.println("import_ou_xlsx.xlsx found and checked success");
+                }
+            }
+        }
+    }
+
+
+    @Test
+    void zipCsvTest() throws Exception {
+        ZipFile zf = new ZipFile(file);
+        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream(resourceZipName));
+        ZipEntry entry;
+        while ((entry = is.getNextEntry()) != null) {
+            try (InputStream inputStream = zf.getInputStream(entry)) {
+                if (entry.getName().equals(textCsvName)) {
+                    CSVReader reader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+                    List<String[]> content = reader.readAll();
+                    org.assertj.core.api.Assertions.assertThat(content).contains(
+                            new String[]{"OU006"}
+                    );
+
+                    System.out.println("import_ou_csv.csv found and checked success");
+                }
+            }
+        }
     }
 }
