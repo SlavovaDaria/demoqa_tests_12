@@ -5,7 +5,7 @@ curl -X POST \
 
 
      java \
-     "-DconfigFile=notifications/telegram.json" \
-     -jar allure-notifications-4.1.jar
+          "-DconfigFile=notifications/telegram.json" \
+          -jar allure-notifications-4.1.jar
 
-      java "-DconfigFile=notifications/telegram.json" -jar allure-notifications-4.1.jar
+           java "-DconfigFile=notifications/telegram.json" -jar allure-notifications-4.1.jar
